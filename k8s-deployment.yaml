@@ -1,0 +1,45 @@
+apiVersion: apps/v1                              # defines the Kubernetes API version being used
+kind: Deployment                                 # defines the Kubernetes object type
+metadata:
+  name: customer-k8s-deployment                  # defines the name of this Deployment object
+spec:
+  replicas: 3                                    # defines the desired number of PODS to maintain
+  selector:
+    matchLabels:
+      app: customer-service                      # defines that all the pods whose label matches 'app: customer-service' are managed by this deployment object
+  template:                                      # defines the pod template for creating new pods.
+    metadata:
+      labels:                                    # define the labels for pods created using this template
+        app: customer-service
+    spec:
+      containers:
+        - name: customer-service                # defines a unique name for the container in the pod. This value can be any name as long as it is unique within the pod
+          image: customer-service:1.0           # defines the docker image from which the container must be created
+          imagePullPolicy: IfNotPresent
+          ports:                                # defines the ports that must be exposed within the container
+            - containerPort: 8080
+          env:                                  # defines the environment variables to be set within the container
+            - name: DB_HOST                     # this is an environment variable that is declared in the application.properties file of the customer service application
+              value: "mysql-service"            # this is the service name that is specified in the database related kubernetes config object file
+            - name: DB_NAME
+              valueFrom:                        # valueFrom is used to reference values from config-maps or secrets
+                configMapKeyRef:
+                  name: customer-k8s-config     # defines the config map from which the value of the key 'dbName' needs to be fetched
+                  key: dbName
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: customer-k8s-secrets    # defines the secret from which the value of the key 'password' needs to be fetched
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: customer-k8s-secrets
+                  key: password
+          resources:
+            limits:                             # defines maximum amount of resources a container is allowed to use
+              memory: "512Mi"                   # defines that the container can use up to 512 megabytes of memory
+              cpu: "500m"                       # defines that the container can use up to 500 milliCPU units (equivalent to half a CPU core)
+            requests:                           # defines the minimum amount of resources a container requires to run
+              memory: "256Mi"                   # defines that the container needs at least 256 megabytes of memory to run
+              cpu: "250m"                       # defines that the container needs at least 250 milliCPU units

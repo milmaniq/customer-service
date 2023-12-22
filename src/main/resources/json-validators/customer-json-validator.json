@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Customer",
+  "description": "A Customer",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier for a customer",
+      "type": "integer"
+    },
+    "name": {
+      "description": "Name of the customer",
+      "type": "string"
+    }
+  },
+  "required": ["id", "name"]
+}

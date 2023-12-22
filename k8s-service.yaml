@@ -1,0 +1,13 @@
+apiVersion: v1                  # defines the Kubernetes API version
+kind: Service                   # defines the Kubernetes object type
+metadata:
+  name: customer-k8s-service    # defines the name of the service
+spec:
+  type: NodePort                # defines the type of service. 'NodePort' defines this service as an external service. Default type is 'ClusterIP' which when used will define this service as an internal service
+  selector:
+    app: customer-service       # defines that all the pods whose label matches 'app: customer-service' are exposed by this service object
+  ports:
+    - protocol: TCP             # defines the network protocol to be used
+      port: 8080                # defines the port in which the service can be accessed in the cluster
+      targetPort: 8080          # defines the pod's port with which the pod communicates. technically, the target port must be the same as the containerPort defined in the deployment object
+      nodePort: 30100           # defines that the service will be accessed on a static port (port range: 30000-32767) on each node's IP. The nodes IP can be extracted by running 'kubectl get nodes -o wide'
